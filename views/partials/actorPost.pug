@@ -6,29 +6,36 @@
       span=val.actor.profile.name
   .content.dimmable(class=val.flagged ? "dimmed": "")
     .ui.dimmer.flag(class=val.flagged ? "active": "")
-      ...
+      .content
+        .center
+          h2.ui.inverted.icon.header
+            i.red.flag.icon
+            | You've flagged this!
+            h3.ui.inverted.header
+              span="The admins will review this post further. We are sorry you had this experience."
           .ui.inverted.unflag.button(tabindex='0')
             i.flag.icon
             |  Unflag
-    .img.post.image
-    - const pic = (val.picture || '').toString()
-    - const isVideo = pic.toLowerCase().endsWith('.mp4')
 
-    if isVideo
-      video(
-        src='/post_pictures/' + pic
-        controls
-        playsinline
-        preload='metadata'
-        style='max-width:100%; width:100%; display:block;'
-      )
-        | Your browser does not support the video tag.
-    else
-      img(
-        src='/public/picture.svg'
-        data-src='/post_pictures/' + pic
-        style='max-width:100%; width:100%; display:block;'
-      )
+    .img.post.image
+      - var pic = (val.picture || '').toString()
+      - var isVideo = pic && pic.toLowerCase().endsWith('.mp4')
+
+      if isVideo
+        video(
+          src='/post_pictures/' + pic
+          controls
+          playsinline
+          preload='metadata'
+          style='max-width:100%; width:100%; display:block;'
+        )
+          | Your browser does not support the video tag.
+      else if pic
+        img(
+          src='/public/picture.svg'
+          data-src='/post_pictures/' + pic
+          style='max-width:100%; width:100%; display:block;'
+        )
   .description=val.body
     .myTimer.hidden 0
   .ui.bottom.three.attached.icon.buttons
