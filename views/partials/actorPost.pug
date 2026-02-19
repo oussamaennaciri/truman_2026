@@ -30,11 +30,10 @@
       )
         | Your browser does not support the video tag.
     else
-      img(
-        src='/public/picture.svg'
-        data-src='/post_pictures/' + pic
-        style='max-width:100%; width:100%;'
-      )
+    img(
+      src='/post_pictures/' + pic
+      style='max-width:100%; width:100%;'
+    )
   .description=val.body
     .myTimer.hidden 0
   .ui.bottom.three.attached.icon.buttons
