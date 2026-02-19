@@ -23,7 +23,7 @@
         source(src=cdn+"/post_pictures/"+val.picture, type="video/mp4")
         | Your browser does not support the video tag.
     else
-      img(src='/public/picture.svg', data-src=cdn+"/post_pictures/"+val.picture, style="max-width:100%; width:100%;")
+      img(src='/public/picture.svg', data-src="/post_pictures/"+val.picture, style="max-width:100%; width:100%;")
   .description=val.body
     .myTimer.hidden 0
   .ui.bottom.three.attached.icon.buttons
