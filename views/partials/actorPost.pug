@@ -17,13 +17,24 @@
             i.flag.icon
             |  Unflag
     .img.post.image
-    - var isVideo = val.picture && val.picture.toLowerCase().endsWith('.mp4');
+    - var pic = (val.picture || '').toString();
+    - var isVideo = pic.toLowerCase().endsWith('.mp4');
+
     if isVideo
-      video(controls, style="max-width:100%; width:100%;", preload="metadata")
-        source(src=cdn+"/post_pictures/"+val.picture, type="video/mp4")
+      video(
+        src='/post_pictures/' + pic
+        controls
+        playsinline
+        preload='metadata'
+        style='max-width:100%; width:100%;'
+      )
         | Your browser does not support the video tag.
     else
-      img(src='/public/picture.svg', data-src="/post_pictures/"+val.picture, style="max-width:100%; width:100%;")
+      img(
+        src='/public/picture.svg'
+        data-src='/post_pictures/' + pic
+        style='max-width:100%; width:100%;'
+      )
   .description=val.body
     .myTimer.hidden 0
   .ui.bottom.three.attached.icon.buttons
