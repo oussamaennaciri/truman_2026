@@ -43,15 +43,21 @@ exports.getScript = async(req, res, next) => {
         }
 
         // Array of actor posts that match the user's experimental condition, within the past 24 hours, sorted by descending time. 
-        let script_feed = await Script.find({
-                condition: { "$in": ["", user.experimentalCondition] }
-            })
-            .where('time').lte(time_diff).gte(time_limit)
-            .sort('-time')
-            .populate('actor')
-            .populate('comments.actor')
-            .exec();
+        const script_feed_raw = await Script.aggregate([
+  {
+    $match: {
+      condition: { $in: ["", user.experimentalCondition] },
+      time: { $lte: time_diff, $gte: time_limit }
+    }
+  },
+  { $sample: { size: 500 } } // pick a number >= the max posts you expect in 24h
+]);
 
+// aggregate returns plain objects; populate actor + comments.actor
+const script_feed = await Script.populate(script_feed_raw, [
+  { path: 'actor' },
+  { path: 'comments.actor' }
+]);
         // Array of any user-made posts within the past 24 hours, sorted by time they were created.
         let user_posts = user.getPostInPeriod(time_limit, time_diff);
         user_posts.sort(function(a, b) {
