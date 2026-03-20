@@ -263,6 +263,9 @@ exports.postUpdateFeedAction = async(req, res, next) => {
             }
             // User interacted with a video (play, pause, mute, unmute, fullscreen).
             else if (req.body.videoAction) {
+                if (!user.feedAction[feedIndex].videoInteractions) {
+                    user.feedAction[feedIndex].videoInteractions = [];
+                }
                 user.feedAction[feedIndex].videoInteractions.push({
                     action: req.body.videoAction,
                     time: Date.now()
