@@ -260,6 +260,13 @@ exports.postUpdateFeedAction = async(req, res, next) => {
                 user.feedAction[feedIndex].readTime.push(view);
                 user.feedAction[feedIndex].rereadTimes++;
                 user.feedAction[feedIndex].mostRecentTime = Date.now();
+            }
+            // User interacted with a video (play, pause, mute, unmute, fullscreen).
+            else if (req.body.videoAction) {
+                user.feedAction[feedIndex].videoInteractions.push({
+                    action: req.body.videoAction,
+                    time: Date.now()
+                });
             } else {
                 console.log('Something in feedAction went crazy. You should never see this.');
             }

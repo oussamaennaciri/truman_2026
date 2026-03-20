@@ -354,6 +354,54 @@ $(window).on('load', () => {
         }
     });
 
+    // Video interaction tracking
+    $('.ui.fluid.card video').each(function() {
+        var video = this;
+        var card = $(this).closest('.ui.fluid.card');
+        var postID = card.attr('postID');
+        var postCondition = card.attr('postCondition');
+
+        video.addEventListener('play', function() {
+            $.post("/feed", {
+                postID: postID,
+                videoAction: 'play',
+                postCondition: postCondition,
+                _csrf: $('meta[name="csrf-token"]').attr('content')
+            });
+        });
+
+        video.addEventListener('pause', function() {
+            $.post("/feed", {
+                postID: postID,
+                videoAction: 'pause',
+                postCondition: postCondition,
+                _csrf: $('meta[name="csrf-token"]').attr('content')
+            });
+        });
+
+        video.addEventListener('volumechange', function() {
+            var action = this.muted ? 'mute' : 'unmute';
+            $.post("/feed", {
+                postID: postID,
+                videoAction: action,
+                postCondition: postCondition,
+                _csrf: $('meta[name="csrf-token"]').attr('content')
+            });
+        });
+
+        document.addEventListener('fullscreenchange', function() {
+            if (document.fullscreenElement === video || !document.fullscreenElement) {
+                var action = document.fullscreenElement ? 'enterFullscreen' : 'exitFullscreen';
+                $.post("/feed", {
+                    postID: postID,
+                    videoAction: action,
+                    postCondition: postCondition,
+                    _csrf: $('meta[name="csrf-token"]').attr('content')
+                });
+            }
+        });
+    });
+
     // Track how long a post is on the screen (borders are defined by image)
     // Start time: When the entire photo is visible in the viewport.
     // End time: When the entire photo is no longer visible in the viewport.

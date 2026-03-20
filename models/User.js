@@ -117,6 +117,11 @@ const userSchema = new mongoose.Schema({
         unflagTime: [Date], // List of absolute times when the user has unflagged the post
         readTime: [Number], // List of durations the user spent looking at the post in milliseconds (we do not record times less than 1.5 seconds and more than 24 hrs)
 
+        videoInteractions: [new Schema({ // Tracks video-specific interactions (play, pause, mute, unmute, fullscreen)
+            action: String, // 'play', 'pause', 'mute', 'unmute', 'enterFullscreen', 'exitFullscreen'
+            time: Date // When the action occurred
+        })],
+
         comments: [new Schema({
             comment: { type: Schema.ObjectId }, // The unique ID for the comment within the post within the database, the comment the user interacted with
             liked: { type: Boolean, default: false }, // Indicates if the user has liked the comment
