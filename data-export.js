@@ -65,7 +65,10 @@ async function getDataExport() {
         { id: 'ActorsReported', title: 'ActorsReported' },
         { id: 'ActorsFollowed', title: 'ActorsFollowed' },
         { id: 'TimeOnSite', title: 'TimeOnSite' },
-        { id: 'PageLog', title: 'PageLog' }
+        { id: 'PageLog', title: 'PageLog' },
+        { id: 'TabSwitchCount', title: 'TabSwitchCount' },
+        { id: 'TotalTimeAway', title: 'TotalTimeAway' },
+        { id: 'TabVisibilityLog', title: 'TabVisibilityLog' }
     ];
     const csvWriter = createCsvWriter({
         path: outputFilepath,
@@ -161,6 +164,10 @@ async function getDataExport() {
 
         record.TimeOnSite = user.pageTimes.reduce((sum, time) => sum + time);
         record.PageLog = user.pageLog.map(pageLog => pageLog.page);
+
+        record.TabSwitchCount = user.tabVisibilityLog ? user.tabVisibilityLog.length : 0;
+        record.TotalTimeAway = user.tabVisibilityLog ? user.tabVisibilityLog.reduce((sum, entry) => sum + entry.duration, 0) : 0;
+        record.TabVisibilityLog = user.tabVisibilityLog ? JSON.stringify(user.tabVisibilityLog) : '[]';
 
         console.log(record);
         records.push(record);

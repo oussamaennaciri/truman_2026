@@ -135,6 +135,18 @@ exports.newPost = async(req, res) => {
 exports.postUpdateFeedAction = async(req, res, next) => {
     try {
         const user = await User.findById(req.user.id).exec();
+
+        // Handle tab visibility event (user-level, not post-level)
+        if (req.body.tabVisibility) {
+            user.tabVisibilityLog.push({
+                hiddenTime: new Date(parseInt(req.body.hiddenTime)),
+                visibleTime: new Date(parseInt(req.body.visibleTime)),
+                duration: parseInt(req.body.duration)
+            });
+            await user.save();
+            return res.send({ result: "success" });
+        }
+
         // Check if user has interacted with the post before.
         let feedIndex = _.findIndex(user.feedAction, function(o) { return o.post == req.body.postID; });
 

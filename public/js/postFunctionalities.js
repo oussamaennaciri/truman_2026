@@ -328,6 +328,32 @@ $(window).on('load', () => {
     // Follow button
     $('.ui.basic.primary.follow.button').on('click', followUser);
 
+    // Tab visibility tracking: pause post view timers when user switches tabs
+    let tabHiddenTime = 0;
+    let accumulatedHiddenTime = 0;
+
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            tabHiddenTime = Date.now();
+        } else {
+            if (tabHiddenTime > 0) {
+                var visibleTime = Date.now();
+                var duration = visibleTime - tabHiddenTime;
+                accumulatedHiddenTime += duration;
+
+                $.post("/feed", {
+                    tabVisibility: true,
+                    hiddenTime: tabHiddenTime,
+                    visibleTime: visibleTime,
+                    duration: duration,
+                    _csrf: $('meta[name="csrf-token"]').attr('content')
+                });
+
+                tabHiddenTime = 0;
+            }
+        }
+    });
+
     // Track how long a post is on the screen (borders are defined by image)
     // Start time: When the entire photo is visible in the viewport.
     // End time: When the entire photo is no longer visible in the viewport.
@@ -344,10 +370,11 @@ $(window).on('load', () => {
         onBottomVisible: function(element) {
             var startTime = parseInt($(this).closest(".ui.fluid.card").find(".myTimer").text());
             // Bottom of picture enters from bottom (scrolling down the feed; as normal)
-            if (element.topVisible) { // Scrolling Down AND entire post is visible on the viewport 
+            if (element.topVisible) { // Scrolling Down AND entire post is visible on the viewport
                 // If this is the first time bottom is visible
                 if (startTime == 0) {
                     var startTime = Date.now();
+                    accumulatedHiddenTime = 0;
                 }
             } else { // Scrolling up and this event does not matter, since entire photo isn't visible anyways.
                 var startTime = 0;
@@ -359,7 +386,8 @@ $(window).on('load', () => {
         onBottomPassed: function(element) {
             var endTime = Date.now();
             var startTime = parseInt($(this).closest(".ui.fluid.card").find(".myTimer").text());
-            var totalViewTime = endTime - startTime; // TOTAL TIME HERE
+            var totalViewTime = endTime - startTime - accumulatedHiddenTime;
+            accumulatedHiddenTime = 0;
 
             var parent = $(this).parents(".ui.fluid.card");
             var postID = parent.attr("postID");
@@ -381,8 +409,9 @@ $(window).on('load', () => {
         // Element's top edge has passed top of the screen (appearing); happens only when Scrolling Up
         onTopPassedReverse: function(element) {
             var startTime = parseInt($(this).closest(".ui.fluid.card").find(".myTimer").text());
-            if (element.bottomVisible && startTime == 0) { // Scrolling Up AND entire post is visible on the viewport 
+            if (element.bottomVisible && startTime == 0) { // Scrolling Up AND entire post is visible on the viewport
                 var startTime = Date.now();
+                accumulatedHiddenTime = 0;
                 $(this).closest(".ui.fluid.card").find(".myTimer").text(startTime);
             }
         },
@@ -393,7 +422,8 @@ $(window).on('load', () => {
             } else { // False when Scrolling Up (the bottom of photo exits screen.)
                 var endTime = Date.now();
                 var startTime = parseInt($(this).closest(".ui.fluid.card").find(".myTimer").text());
-                var totalViewTime = endTime - startTime;
+                var totalViewTime = endTime - startTime - accumulatedHiddenTime;
+                accumulatedHiddenTime = 0;
 
                 var parent = $(this).parents(".ui.fluid.card");
                 var postID = parent.attr("postID");

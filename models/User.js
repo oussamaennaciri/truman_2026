@@ -82,6 +82,12 @@ const userSchema = new mongoose.Schema({
         page: String // URL
     })],
 
+    tabVisibilityLog: [new Schema({ // Logs when user switches away from the tab and returns
+        hiddenTime: Date, // When the tab became hidden
+        visibleTime: Date, // When the tab became visible again
+        duration: Number // Duration away in milliseconds
+    })],
+
     pageTimes: { // Indicates how much time the user spent on the website per day where index 0 corresponds to the first day, index 1 corresopnds to the second day, etc.
         type: [Number],
         default: Array(parseInt(process.env.NUM_DAYS)).fill(0)
